@@ -11,12 +11,13 @@ class Row:
 
 
 class Solver:
-    def __init__(self, n, mrv=False, lcv=False):
+    def __init__(self, n, mrv=False, lcv=False, mcv=False):
         self.n = n
         self.board = []
         self.rows = self.init()
         self.mrv = mrv
         self.lcv = lcv
+        self.mcv = mcv
 
     def get_min_val(self):
         min = 1000
@@ -24,6 +25,16 @@ class Solver:
         for i in range(len(self.rows)):
             if len(self.rows[i].empty_place) < min and self.rows[i].queen == -1:
                 min = len(self.rows[i].empty_place)
+                index = i
+
+        return index
+
+    def get_max_val(self):
+        max = 0
+        index = -1
+        for i in range(len(self.rows)):
+            if len(self.rows[i].empty_place) > max and self.rows[i].queen == -1:
+                max = len(self.rows[i].empty_place)
                 index = i
 
         return index
@@ -75,6 +86,32 @@ class Solver:
             self.board.pop()
             return index
 
+    def solve_with_variables(self):
+        for r in self.rows:
+            for col in range(self.n):
+                self.board.append(col)
+                if self.is_valid_move():
+                    if (r.row, col) not in r.empty_place:
+                        r.empty_place.append((r.row, col))
+                else:
+                    if (r.row, col) in r.empty_place:
+                        r.empty_place.remove((r.row, col))
+                self.board.pop()
+
+    def solve_with_mrv(self):
+        self.solve_with_variables()
+        next_row = self.rows[self.get_min_val()]
+        for rr in self.rows:
+            rr.empty_place.clear()
+        return next_row
+
+    def solve_with_mcv(self):
+        self.solve_with_variables()
+        next_row = self.rows[self.get_max_val()]
+        for rr in self.rows:
+            rr.empty_place.clear()
+        return next_row
+
     def solve(self):
         self.solveUntil(self.n, self.rows[0])
 
@@ -88,21 +125,13 @@ class Solver:
             else:
                 next_row = self.rows[row.row + 1]
 
+            # Backtracking with MCV
+            if self.mcv:
+                next_row = self.solve_with_mcv()
+
             # Backtracking with MRV
             if self.mrv:
-                for r in self.rows:
-                    for col in range(n):
-                        self.board.append(col)
-                        if self.is_valid_move():
-                            if (r.row, col) not in r.empty_place:
-                                r.empty_place.append((r.row, col))
-                        else:
-                            if (r.row, col) in r.empty_place:
-                                r.empty_place.remove((r.row, col))
-                        self.board.pop()
-                next_row = self.rows[self.get_min_val()]
-                for rr in self.rows:
-                    rr.empty_place.clear()
+                next_row = self.solve_with_mrv()
 
             # Backtracking with LCV
             if self.lcv:
@@ -114,10 +143,6 @@ class Solver:
                         return True
                 row.queen = -1
                 self.board.pop()
-
-
-
-
 
             # Normal backtracking
             for col in range(n):
@@ -172,7 +197,12 @@ class Solver:
         return moves
 
 
-solver = Solver(8, mrv=False, lcv=True)
+solver = Solver(8, lcv=True, mrv=True)
+solver.solve()
+solver.display()
+print(solver.board)
+
+solver = Solver(8, mrv=True)
 solver.solve()
 solver.display()
 print(solver.board)
