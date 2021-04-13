@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import random as rn
 
 class Row:
     def __init__(self, row, queen, empty_place):
