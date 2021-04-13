@@ -1,62 +1,48 @@
-import random as rn
 import numpy as np
 
-class Board:
-    def __init__(self, N):
-        self.N = N
-        self.board = np.zeros((self.N, self.N)).tolist()
 
-    def display(self):
-        print(np.array(self.board))
+class Position:
+    def __init__(self, row, col):
+        self.col = col
+        self.row = row
 
-    def solve(self):
-        self.solve_backtracking(0)
 
-    def solve_backtracking(self, column):
-        if np.array(self.board).sum() == self.N:
+class Solver:
+    def __init__(self, n):
+        self.n = n
+        self.positions = np.full(fill_value=-1, shape=self.n, dtype=int).tolist()
+
+    def solveNQeenOneSolution(self):
+        hasSolution = self.solveNQeenSolutionUtil(self.n, 0, self.positions)
+
+    def solveNQeenSolutionUtil(self, n, row, positions):
+        if n == row:
             return True
         else:
-            for i in range(self.N):
-                if self.is_valid_move(i, column):
-                    self.board[i][column] = 1
-
-                    if self.solve_backtracking(column + 1):
+            for col in range(n):
+                foundSafe = True
+                for queen in range(row):
+                    if positions[queen].col == col or positions[queen].row - \
+                            positions[queen].col == row - col or \
+                            positions[queen].row + positions[queen].col == row + col:
+                        foundSafe = False
+                        break
+                if foundSafe:
+                    positions[row] = Position(row, col)
+                    if self.solveNQeenSolutionUtil(n, row + 1, positions):
                         return True
-                    self.board[i][column] = 0
             return False
 
-    def is_valid_move(self, x, y):
-        att = self.num_of_attacks_on_each(self.board, self.N, x, y)
-        return att == 0
+    def to_board(self, positions):
+        z = np.zeros((self.n, self.n))
+        for pos in positions:
+            z[pos.row, pos.col] = 1
+        return z
 
-    def num_of_attacks_on_each(self, m, N, x, y):
-        map = np.array(m)
-        right_lower_diag = []
-        right_upper_diag = []
-        left_upper_diag = []
-        left_lower_diag = []
-        for i, j in zip(range(x + 1, N), range(y + 1, N)):
-            right_lower_diag.append(map[i][j])
-
-        for i, j in zip(range(x - 1, -1, -1), range(y - 1, -1, -1)):
-            left_upper_diag.append(map[i][j])
-
-        for i, j in zip(range(x + 1, N), range(y - 1, -1, -1)):
-            left_lower_diag.append(map[i][j])
-
-        for i, j in zip(range(x - 1, -1, -1), range(y + 1, N)):
-            right_upper_diag.append(map[i][j])
-
-        row_attacks = map[x, 0:].sum()
-        column_attacks = map[:, y].sum()
-        upper_diag_attakcs = np.array(left_upper_diag).sum() + np.array(right_upper_diag).sum()
-        lower_diag_attakcs = np.array(left_lower_diag).sum() + np.array(right_lower_diag).sum()
-        attacks = row_attacks + column_attacks + upper_diag_attakcs + lower_diag_attakcs
-        return attacks
+    def display(self):
+        print(self.to_board(self.positions))
 
 
-
-
-board = Board(8)
-board.solve()
-board.display()
+solver = Solver(8)
+solver.solveNQeenOneSolution()
+solver.display()
