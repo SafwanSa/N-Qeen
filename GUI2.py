@@ -15,6 +15,7 @@ import pygame as pg
 import itertools
 
 
+# Genetic Algorithm solver
 class GeneticSolver:
     def __init__(self, N, pop_size, mr, gen):
         self.N = N
@@ -81,7 +82,7 @@ class GeneticSolver:
                     game_exit = True
         return population
 
-
+# The part that makes the genetic population
 class DNA:
     def __init__(self, N):
         self.N = N
@@ -149,7 +150,7 @@ class DNA:
                 self.gene[i] = rn.randint(1, self.N - 1)
         self.set_board_from_gene()
 
-
+# A group of DNAs
 class Population:
     def __init__(self, mutationRate, popmax, N):
         self.mutationRate = mutationRate
@@ -205,14 +206,14 @@ class Population:
                 best = dna
         return min, dna
 
-
+# Constrains Satisfaction Proplem Variable
 class Row:
     def __init__(self, row, queen, empty_place):
         self.row = row
         self.queen = queen
         self.empty_place = empty_place
 
-
+# Backtracking Solver with all options MCV, MRV, LCV, FC, and ARC
 class BacktrackingSolver:
     def __init__(self, n, mrv=False, lcv=False, mcv=False, fc=False, arc=False):
         self.n = n
@@ -455,7 +456,7 @@ class BacktrackingSolver:
                 moves.append((x, y))
         return moves
 
-
+# A* Solver
 class AStarSolver:
     def __init__(self, Nn):
         self.Nn = Nn
@@ -547,7 +548,7 @@ class AStarSolver:
                     game_exit = True
         return counter
 
-
+# The board used in A* Algorithm
 class Board:
     def __init__(self, N, cost, parent_attacks, board):
         self.N = N
@@ -632,7 +633,7 @@ class Board:
                 moves.append((x, y))
         return moves
 
-
+# The part responsible of the GUI
 class GUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -805,7 +806,6 @@ def main():
     app = QApplication(sys.argv)
     ex = GUI()
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()
