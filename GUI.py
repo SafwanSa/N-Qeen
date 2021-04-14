@@ -15,7 +15,6 @@ class GUI(QWidget):
         self.initUI()
 
     def initUI(self):
-
         self.mainLayout = QVBoxLayout()
 
         greeting = QLabel("Welcome To Assignment 2\n Enter the number of queens", self)
@@ -146,6 +145,7 @@ class GUI(QWidget):
         except:
             pass
 
+    # Solving the problem with backtracking
     @pyqtSlot()
     def solve_with_backtracking(self):
         n = 0
