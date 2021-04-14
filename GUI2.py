@@ -297,10 +297,10 @@ class BacktrackingSolver:
         return next_row
 
     def solve(self):
-        s = time.time()
+        s = timeit.default_timer()
         # Solve the problem
         self.solveUntil(self.n, self.rows[0])
-        e = time.time()
+        e = timeit.default_timer()
 
         bb = self.to_board()
 
@@ -340,6 +340,7 @@ class BacktrackingSolver:
                 pg.display.flip()
                 pg.time.delay(10)
 
+            return e - s
         return e - s
 
 
@@ -792,7 +793,7 @@ class GUI(QWidget):
             # stepsW = QLabel("Genetic Steps: {}".format(steps), self)
             # stepsW.setAlignment(QtCore.Qt.AlignCenter)
 
-            timeW = QLabel("Genetic Time: {}".format(round(time)), self)
+            timeW = QLabel("Time: {}".format((time)), self)
             timeW.setAlignment(QtCore.Qt.AlignCenter)
 
             self.mainLayout.addWidget(timeW)
