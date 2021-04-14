@@ -96,6 +96,7 @@ class BacktrackingSolver:
 
     def solve(self):
         s = time.time()
+        # Solve the problem
         self.solveUntil(self.n, self.rows[0])
         e = time.time()
 
@@ -115,8 +116,6 @@ class BacktrackingSolver:
         queen_img = pg.image.load("q.png")
         queen_img = pg.transform.scale(queen_img, (square_length, square_length))
         board = pg.Surface((board_width, board_height))
-
-
 
         game_exit = False
         while not game_exit:
@@ -254,7 +253,4 @@ class BacktrackingSolver:
             if self.is_on_board(x, y):
                 moves.append((x, y))
         return moves
-
-    def solve_with_fc(self):
-        pass
 

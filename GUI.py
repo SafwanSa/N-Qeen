@@ -75,6 +75,7 @@ class GUI(QWidget):
         self.setWindowTitle('Solve N-Queen Problem')
         self.show()
 
+    # Solving the problem with A*
     @pyqtSlot()
     def solve_with_a_star(self):
         n = 0
@@ -104,6 +105,7 @@ class GUI(QWidget):
     def stop_solving(self):
         pg.quit()
 
+    # Solving the problem with genetic
     @pyqtSlot()
     def solve_with_genetic(self):
         n = 0
