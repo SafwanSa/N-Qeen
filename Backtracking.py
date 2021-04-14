@@ -2,6 +2,8 @@ import numpy as np
 import time
 import random as rn
 import copy
+import pygame as pg
+import itertools
 
 class Row:
     def __init__(self, row, queen, empty_place):
@@ -10,7 +12,7 @@ class Row:
         self.empty_place = empty_place
 
 
-class Solver:
+class BacktrackingSolver:
     def __init__(self, n, mrv=False, lcv=False, mcv=False, fc=False, arc=False):
         self.n = n
         self.board = []
@@ -93,7 +95,52 @@ class Solver:
         return next_row
 
     def solve(self):
+        s = time.time()
         self.solveUntil(self.n, self.rows[0])
+        e = time.time()
+
+        bb = self.to_board()
+
+        print(self.board)
+        print(np.array(bb))
+        pg.init()
+        square_length = 40
+        board_width, board_height = self.n * square_length, self.n * square_length
+        window = pg.display.set_mode((board_width, board_height))
+
+
+        GREY = pg.Color('gray')
+        WHITE = pg.Color('white')
+        colors = itertools.cycle((WHITE, GREY))
+        queen_img = pg.image.load("q.png")
+        queen_img = pg.transform.scale(queen_img, (square_length, square_length))
+        board = pg.Surface((board_width, board_height))
+
+
+
+        game_exit = False
+        while not game_exit:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    game_exit = True
+
+                for y in range(0, board_height, square_length):
+                    for x in range(0, board_width, square_length):
+                        square = (x, y, square_length, square_length)
+                        pg.draw.rect(board, next(colors), square)
+                    if self.n % 2 == 0:
+                        next(colors)
+                    for i in range(self.n):
+                        for j in range(self.n):
+                            if bb[i][j] == 1:
+                                board.blit(queen_img, (j * square_length, i * square_length))
+                pg.display.update()
+                window.blit(board, (0, 0))
+                pg.display.flip()
+                pg.time.delay(10)
+
+        return e - s
+
 
     # Solve the problem with all required algorithms
     def solveUntil(self, n, row):
@@ -140,7 +187,7 @@ class Solver:
                     self.solve_with_variables()
 
             if self.arc:
-                for col in range(self.n):
+                for _, col in row.empty_place:
                     self.board.append(col)
                     if self.is_valid_move():
                         self.solve_with_variables()
@@ -179,7 +226,7 @@ class Solver:
         board = np.zeros((self.n, self.n)).tolist()
         for i in range(self.n):
             try:
-                board[self.board[i] - 1][i] = 1
+                board[self.board[i]][i] = 1
             except IndexError:
                 print(self.board)
         return board
@@ -211,12 +258,3 @@ class Solver:
     def solve_with_fc(self):
         pass
 
-
-s = time.time()
-solver = Solver(8, arc=True, mrv=True)
-solver.solve()
-e = time.time()
-print(e - s)
-solver.display()
-print(solver.board)
-print(solver.counter)
