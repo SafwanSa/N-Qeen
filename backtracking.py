@@ -11,13 +11,14 @@ class Row:
 
 
 class Solver:
-    def __init__(self, n, mrv=False, lcv=False, mcv=False):
+    def __init__(self, n, mrv=False, lcv=False, mcv=False, fc=False):
         self.n = n
         self.board = []
         self.rows = self.init()
         self.mrv = mrv
         self.lcv = lcv
         self.mcv = mcv
+        self.fc = fc
 
     def get_min_val(self):
         min = 1000
@@ -101,15 +102,11 @@ class Solver:
     def solve_with_mrv(self):
         self.solve_with_variables()
         next_row = self.rows[self.get_min_val()]
-        for rr in self.rows:
-            rr.empty_place.clear()
         return next_row
 
     def solve_with_mcv(self):
         self.solve_with_variables()
         next_row = self.rows[self.get_max_val()]
-        for rr in self.rows:
-            rr.empty_place.clear()
         return next_row
 
     def solve(self):
@@ -144,16 +141,55 @@ class Solver:
                 row.queen = -1
                 self.board.pop()
 
-            # Normal backtracking
-            for col in range(n):
-                self.board.append(col)
-                row.queen = col
-                if self.is_valid_move():
-                    if self.solveUntil(n, next_row):
-                        return True
-                row.queen = -1
-                self.board.pop()
-            return False
+                # Normal backtracking
+                if len(self.board) == 0:
+
+                    for col in range(n):
+                        self.board.append(col)
+                        row.queen = col
+                        if self.is_valid_move():
+                            if self.solveUntil(n, next_row):
+                                return True
+                        row.queen = -1
+                        self.board.pop()
+                    return False
+
+            if self.fc:
+                self.solve_with_variables()
+                if len(row.empty_place) < 1:
+                    return False
+                for _, col in row.empty_place:
+                    self.board.append(col)
+                    row.queen = col
+                    if self.is_valid_move():
+                        if self.solveUntil(n, next_row):
+                            return True
+                    self.board.pop()
+                    row.queen = -1
+
+                if len(self.board) == 0:
+                    # Normal backtracking
+                    for col in range(n):
+                        self.board.append(col)
+                        row.queen = col
+                        if self.is_valid_move():
+                            if self.solveUntil(n, next_row):
+                                return True
+                        row.queen = -1
+                        self.board.pop()
+                    return False
+
+            else:
+                # Normal backtracking
+                for col in range(n):
+                    self.board.append(col)
+                    row.queen = col
+                    if self.is_valid_move():
+                        if self.solveUntil(n, next_row):
+                            return True
+                    row.queen = -1
+                    self.board.pop()
+                return False
 
     def is_valid_move(self):
         col = len(self.board) - 1
@@ -196,13 +232,11 @@ class Solver:
                 moves.append((x, y))
         return moves
 
+    def solve_with_fc(self):
+        pass
 
-solver = Solver(8, lcv=True, mrv=True)
-solver.solve()
-solver.display()
-print(solver.board)
 
-solver = Solver(8, mrv=True)
+solver = Solver(8, fc=True, mrv=True)
 solver.solve()
 solver.display()
 print(solver.board)
